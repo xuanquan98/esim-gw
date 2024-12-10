@@ -29,4 +29,10 @@ public class JoytelController {
         // Gọi API từ URL đã nhận và trả về kết quả
         return ResponseEntity.ok().body("hello");
     }
+
+    @GetMapping("/hello1")
+    public ResponseEntity<?> hello1() {
+        // Gọi API từ URL đã nhận và trả về kết quả
+        return ResponseEntity.ok().body("hello");
+    }
 }
