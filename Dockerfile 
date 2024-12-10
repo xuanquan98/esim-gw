@@ -1,0 +1,14 @@
+# Sử dụng OpenJDK 23 làm base image
+FROM openjdk:23-jdk-slim
+
+# Thiết lập thư mục làm việc trong container
+WORKDIR /app
+
+# Copy file JAR của ứng dụng vào container
+COPY target/springboot-app.jar /app/springboot-app.jar
+
+# Mở cổng 8080 (hoặc cổng mà ứng dụng của bạn sử dụng)
+EXPOSE 8080
+
+# Lệnh để chạy ứng dụng Spring Boot
+ENTRYPOINT ["java", "-jar", "/app/springboot-app.jar"]
