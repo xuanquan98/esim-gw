@@ -1,0 +1,51 @@
+name: CI/CD for Spring Boot Application
+
+on:
+  push:
+    branches:
+      - main  # Trigger the action on push to main branch
+  pull_request:
+    branches:
+      - main  # Trigger on pull request to main branch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up JDK 23
+        uses: actions/setup-java@v2
+        with:
+          java-version: '23'
+
+      - name: Build the project
+        run: ./mvnw clean install -DskipTests
+
+      - name: Build Docker image
+        run: docker build -t my-springboot-app .
+
+      - name: Log in to DigitalOcean Docker registry (optional)
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Push Docker image to DockerHub (optional)
+        run: |
+          docker tag my-springboot-app ${{ secrets.DOCKER_USERNAME }}/my-springboot-app:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/my-springboot-app:latest
+
+      - name: SSH to DigitalOcean droplet and deploy the Docker container
+        uses: appleboy/ssh-action@v0.1.5
+        with:
+          host: ${{ secrets.DIGITALOCEAN_HOST }}
+          username: ${{ secrets.DIGITALOCEAN_USERNAME }}
+          key: ${{ secrets.DIGITALOCEAN_SSH_KEY }}
+          script: |
+            docker pull ${{ secrets.DOCKER_USERNAME }}/my-springboot-app:latest
+            docker stop my-springboot-app || true
+            docker rm my-springboot-app || true
+            docker run -d --name my-springboot-app -p 8080:8080 ${{ secrets.DOCKER_USERNAME }}/my-springboot-app:latest
