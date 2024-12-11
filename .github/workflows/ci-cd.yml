@@ -57,4 +57,4 @@ jobs:
             
             # Run the Docker container using docker-compose
             echo "Starting Docker container with docker-compose..."
-            docker-compose -f /home/${{ secrets.DIGITALOCEAN_USERNAME }}/docker-compose.yml up -d
+            docker-compose -f docker-compose.yml up -d
