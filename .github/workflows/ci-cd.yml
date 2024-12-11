@@ -51,4 +51,4 @@ jobs:
             docker pull ${{ secrets.DOCKER_USERNAME }}/my-springboot-app:latest
             docker stop my-springboot-app || true
             docker rm my-springboot-app || true
-            docker run -d --name my-springboot-app -p 8080:8080 ${{ secrets.DOCKER_USERNAME }}/my-springboot-app:latest
+            docker run -d --name my-springboot-app -p 8080:8080 --log-driver=json-file ${{ secrets.DOCKER_USERNAME }}/my-springboot-app:latest
