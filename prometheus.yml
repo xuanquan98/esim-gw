@@ -1,0 +1,7 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'spring-boot'
+    static_configs:
+      - targets: ['springboot:8080']  # Replace with your Spring Boot app's service name and port
