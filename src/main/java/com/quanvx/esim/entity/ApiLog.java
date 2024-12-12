@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "api_logs")
 @AllArgsConstructor
-@NoArgsConstructor
 @Data
 public class ApiLog {
 
