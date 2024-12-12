@@ -19,7 +19,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: '23'
-          distribution: 'temurin'  # 'temurin' is the new name for AdoptOpenJDK under Adoptium
+          distribution: 'temurin'
 
       # Step 3: Verify Java version
       - name: Check Java version
@@ -33,7 +33,7 @@ jobs:
       # Step 5: Build Spring Boot application
       - name: Build Spring Boot application
         run: |
-          ./mvnw clean package -DskipTests
+          ./mvnw clean package -DskipTests  # This should generate target/myapp.jar
 
       # Step 6: Set up Docker
       - name: Set up Docker
@@ -42,12 +42,12 @@ jobs:
       # Step 7: Build Docker image for Spring Boot app
       - name: Build Docker image for Spring Boot
         run: |
-          docker build -t my-app-image .
+          docker build -t my-app-image:latest .  # Ensure target/myapp.jar exists here
 
       # Step 8: Save Docker image as tar file for transfer
       - name: Save Docker image
         run: |
-          docker save my-app-image -o my-app-image.tar
+          docker save my-app-image:latest -o my-app-image.tar
 
       # Step 9: Transfer Docker image and docker-compose.yml to droplet
       - name: Copy files to droplet
@@ -61,7 +61,7 @@ jobs:
             docker-compose.yml
           target: ~/
 
-      # Step 10: SSH into droplet and deploy
+      # Step 10: SSH into droplet, stop running container, and deploy the new one
       - name: Deploy application
         uses: appleboy/ssh-action@v0.1.9
         with:
@@ -69,5 +69,21 @@ jobs:
           username: ${{ secrets.DROPLET_USER }}
           password: ${{ secrets.DROPLET_PASSWORD }}
           script: |
+            # Stop the currently running container (springboot-app and grafana)
+            if [ "$(docker ps -q -f name=springboot-app)" ]; then
+              echo "Stopping springboot-app container..."
+              docker stop springboot-app
+              docker rm springboot-app
+            fi
+
+            if [ "$(docker ps -q -f name=grafana)" ]; then
+              echo "Stopping grafana container..."
+              docker stop grafana
+              docker rm grafana
+            fi
+
+            # Load the new Docker image
             docker load -i ~/my-app-image.tar
+
+            # Restart the docker-compose services (springboot-app and grafana)
             docker-compose -f ~/docker-compose.yml up -d --build

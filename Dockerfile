@@ -1,14 +1,14 @@
-# Use an official OpenJDK image as a base
+# Use an official OpenJDK runtime as a parent image
 FROM openjdk:23-jdk-slim
 
-# Set the working directory
+# Set the working directory inside the container
 WORKDIR /app
 
-# Copy the jar file into the container
+# Copy the JAR file from the build context into the container
 COPY target/myapp.jar /app/myapp.jar
 
 # Expose the port your Spring Boot app runs on (default 8080)
 EXPOSE 8080
 
 # Run the Spring Boot application
-ENTRYPOINT ["java", "-jar", "/app/myapp.jar"]
+CMD ["java", "-jar", "/app/myapp.jar"]
