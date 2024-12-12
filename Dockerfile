@@ -5,7 +5,7 @@ FROM openjdk:23-jdk-slim
 WORKDIR /app
 
 # Copy the JAR file from the build context into the container
-COPY target/myapp.jar /app/myapp.jar
+COPY target/*.jar /app/myapp.jar
 
 # Expose the port your Spring Boot app runs on (default 8080)
 EXPOSE 8080
