@@ -1,5 +1,7 @@
 package com.quanvx.esim.controller;
 
+import com.quanvx.esim.request.sapo.SapoOrderRequestDTO;
+import com.quanvx.esim.services.SapoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -8,6 +10,9 @@ import org.springframework.web.client.RestTemplate;
 
 @RestController
 public class JoytelController {
+
+    @Autowired
+    private SapoService sapoService;
 
     // Inject RestTemplate để gửi HTTP request
     @Autowired
@@ -33,11 +38,8 @@ public class JoytelController {
     }
 
     @PostMapping("/sapo/hook/orders/create")
-    public ResponseEntity<?> hookOrderCreate(@RequestBody Object obj) {
-
-        // Log the request body
-        System.out.println("Request Body: " + obj.toString());
-        // Gọi API từ URL đã nhận và trả về kết quả
+    public ResponseEntity<?> hookOrderCreate(@RequestBody SapoOrderRequestDTO req) {
+        sapoService.hookOrderCreate(req);
         return ResponseEntity.ok().body("/sapo/hook/orders/create");
     }
 }
