@@ -14,10 +14,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: List files for debugging
+        run: |
+          ls -al
+
       # Step 2: Build Spring Boot application
       - name: Build Spring Boot application
         run: |
-          cd esim-gw
+        
           ./mvnw clean package -DskipTests
 
       # Step 3: Set up Docker
