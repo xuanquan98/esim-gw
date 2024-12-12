@@ -36,7 +36,7 @@ public class JoytelImpl implements JoytelService {
                             entity,
                             new ParameterizedTypeReference<JoytelResponse<OrderResponse>>() {});
         log.info("---------");
-        log.info(String.valueOf(response));
+        log.info(String.valueOf(response.getBody()));
         return response.getBody();
         }
     }
