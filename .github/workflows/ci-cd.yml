@@ -1,60 +1,56 @@
-name: CI/CD for Spring Boot Application
+name: CI/CD with Docker and Droplet
 
 on:
   push:
     branches:
-      - master
-  pull_request:
-    branches:
-      - master
+      - main
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1: Checkout the repository
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
-      - name: Set up JDK 23
-        uses: actions/setup-java@v2
-        with:
-          java-version: '23'
-          java-package: jdk
-          architecture: x64
-          distribution: 'zulu'
-
-      - name: Build the project
-        run: ./mvnw clean install -DskipTests
-
-      - name: Build Docker image
-        run: docker build -t my-springboot-app .
-
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Push Docker image to Docker Hub
+      # Step 2: Clone repository from GitHub
+      - name: Clone repository
         run: |
-          docker tag my-springboot-app ${{ secrets.DOCKER_USERNAME }}/my-springboot-app:latest
-          docker push ${{ secrets.DOCKER_USERNAME }}/my-springboot-app:latest
+          git clone https://github.com/xuanquan98/esim-gw.git
+          cd esim-gw
 
-      - name: SSH to DigitalOcean Droplet and deploy the Docker container
-        uses: appleboy/ssh-action@v0.1.5
+      # Step 3: Set up Docker
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v2
+
+      # Step 4: Build Docker image
+      - name: Build Docker image
+        run: |
+          docker build -t my-app-image .
+
+      # Step 5: Save Docker image as tar file for transfer
+      - name: Save Docker image
+        run: |
+          docker save my-app-image -o my-app-image.tar
+
+      # Step 6: Transfer Docker image to the droplet
+      - name: Copy Docker image to droplet
+        uses: appleboy/scp-action@v0.2.1
         with:
-          host: ${{ secrets.DIGITALOCEAN_HOST }}
-          username: ${{ secrets.DIGITALOCEAN_USERNAME }}
-          password: ${{ secrets.DIGITALOCEAN_PASSWORD }}
+          host: ${{ secrets.DROPLET_IP }}
+          username: ${{ secrets.DROPLET_USER }}
+          password: ${{ secrets.DROPLET_PASSWORD }}
+          source: my-app-image.tar
+          target: ~/my-app-image.tar
+
+      # Step 7: SSH into droplet and deploy
+      - name: Deploy application
+        uses: appleboy/ssh-action@v0.1.9
+        with:
+          host: ${{ secrets.DROPLET_IP }}
+          username: ${{ secrets.DROPLET_USER }}
+          password: ${{ secrets.DROPLET_PASSWORD }}
           script: |
-            # Pull the latest Docker image
-            docker pull ${{ secrets.DOCKER_USERNAME }}/my-springboot-app:latest
-            
-            # Copy docker-compose.yml to the droplet (make sure it exists in your GitHub repo)
-            echo "Copying docker-compose.yml to the droplet..."
-            scp -o StrictHostKeyChecking=no docker-compose.yml ${{ secrets.DIGITALOCEAN_USERNAME }}@${{ secrets.DIGITALOCEAN_HOST }}:/home/${{ secrets.DIGITALOCEAN_USERNAME }}/docker-compose.yml
-            
-            # Run the Docker container using docker-compose
-            echo "Starting Docker container with docker-compose..."
-            docker-compose -f docker-compose.yml up -d
+            docker load -i ~/my-app-image.tar
+            docker-compose -f ~/path-to-docker-compose.yml up -d --build
