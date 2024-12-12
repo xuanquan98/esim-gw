@@ -1,46 +1,26 @@
 version: '3.8'
 
 services:
-  springboot:
-    image: springboot-app
-    build: ./springboot  # Replace with the path to your Spring Boot app
+  springboot-app:
+    image: my-app-image:latest
+    container_name: springboot-app
     ports:
-      - "8080:8080"  # Expose Spring Boot app on port 8080
+      - "8080:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=prod
-    networks:
-      - app-network
-
-  prometheus:
-    image: prom/prometheus:latest
-    container_name: prometheus
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-    ports:
-      - "9090:9090"
-    networks:
-      - app-network
-
-  loki:
-    image: grafana/loki:2.8.2
-    container_name: loki
-    ports:
-      - "3100:3100"
-    networks:
-      - app-network
+    restart: always
 
   grafana:
     image: grafana/grafana:latest
     container_name: grafana
-    environment:
-      - GF_SECURITY_ADMIN_PASSWORD=admin
     ports:
-      - "3000:3000"  # Grafana UI accessible on port 3000
-    networks:
-      - app-network
-    depends_on:
-      - loki
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+    restart: always
 
-networks:
-  app-network:
-    driver: bridge
+volumes:
+  grafana_data:
