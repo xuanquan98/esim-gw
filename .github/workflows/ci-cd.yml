@@ -14,11 +14,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Step 2: Clone repository from GitHub
-      - name: Clone repository
+      # Step 2: Build Spring Boot application
+      - name: Build Spring Boot application
         run: |
-          git clone https://github.com/xuanquan98/esim-gw.git
           cd esim-gw
+          ./mvnw clean package -DskipTests
 
       # Step 3: Set up Docker
       - name: Set up Docker
