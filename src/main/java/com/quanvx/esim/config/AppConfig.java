@@ -14,5 +14,9 @@ public class AppConfig {
     private String joytelUrl;
     @Value("${joytel.url.path-order}")
     private String joytelUrlPathOrder;
+    @Value("${joytel.customer-code}")
+    private String joytelCustomerCode;
+    @Value("${joytel.customer-auth}")
+    private String joytelCustomerAuth;
 
 }

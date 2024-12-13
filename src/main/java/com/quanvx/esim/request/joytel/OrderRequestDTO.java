@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Setter
 @Getter
@@ -21,6 +22,10 @@ public class OrderRequestDTO {
     private String email;
     @JsonProperty("itemList")
     private List<Item> itemList;
+    private String warehouse;
+    private String orderTid;
+
+
 
     @Setter
     @Getter

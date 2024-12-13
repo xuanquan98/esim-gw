@@ -1,12 +1,13 @@
 package com.quanvx.esim.services.impl;
 
+import com.quanvx.esim.config.AppConfig;
 import com.quanvx.esim.request.joytel.OrderRequestDTO;
 import com.quanvx.esim.request.sapo.SapoOrderRequestDTO;
 import com.quanvx.esim.response.joytel.JoytelResponse;
 import com.quanvx.esim.response.joytel.OrderResponse;
+import com.quanvx.esim.services.EncryptionService;
 import com.quanvx.esim.services.JoytelService;
 import com.quanvx.esim.services.SapoService;
-import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,12 +16,17 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @Service
 public class SapoServiceImpl implements SapoService {
     @Autowired
+    private EncryptionService encryptionService;
+    @Autowired
     private JoytelService joytel;
+    @Autowired
+    private AppConfig appConfig;
     private static final Logger log = LoggerFactory.getLogger(SapoServiceImpl.class);
 
     @Override
@@ -29,7 +35,7 @@ public class SapoServiceImpl implements SapoService {
         log.info(req.toString());
 
         // mock data joytel
-        JoytelResponse<OrderResponse> res = joytel.orderJoytel(mockDateJoytel());
+        JoytelResponse<OrderResponse> res = joytel.orderJoytel(mockDateJoytel(req));
         log.info(Optional.ofNullable(res).orElse(new JoytelResponse<>()).toString());
 
 
@@ -37,17 +43,16 @@ public class SapoServiceImpl implements SapoService {
     }
 
 
-    private OrderRequestDTO mockDateJoytel() {
+    private OrderRequestDTO mockDateJoytel(SapoOrderRequestDTO req) {
         // Create the main DTO object
         OrderRequestDTO orderRequest = new OrderRequestDTO();
-        orderRequest.setCustomerCode("test001");
+        orderRequest.setCustomerCode(appConfig.getJoytelCustomerCode());
         orderRequest.setType(3);
         orderRequest.setReceiveName("test");
-        orderRequest.setPhone("15666666666");
+        orderRequest.setPhone("0838866309");
         orderRequest.setTimestamp(1667807404146L);
-        orderRequest.setAutoGraph("ae09d951095d44faabf3c91a9879afdc477dd630");
         orderRequest.setRemark("test");
-        orderRequest.setEmail("test@qq.com");
+        orderRequest.setEmail("quanvu143@gmail.com");
 
         // Create the item list
         List<OrderRequestDTO.Item> items = new ArrayList<>();
@@ -65,7 +70,37 @@ public class SapoServiceImpl implements SapoService {
 
         // Set the item list in the DTO
         orderRequest.setItemList(items);
+
+        //gen autograp
+        String customStr = getCustomString(orderRequest);
+        String autoGraph = encryptionService.sha1Encrypt(customStr);
+        orderRequest.setAutoGraph(autoGraph);
         return orderRequest;
+
+
     }
+
+
+    private String getCustomString( OrderRequestDTO orderRequest) {
+        // Concatenate itemList details
+        String itemDetails = orderRequest.getItemList().stream()
+                .map(item -> item.getProductCode() + item.getQuantity())
+                .collect(Collectors.joining(""));
+
+        // Construct final string
+        return String.format("%s%s%s%s%s%s%s%s%s",
+                appConfig.getJoytelCustomerCode(),
+                appConfig.getJoytelCustomerAuth(),
+                Optional.ofNullable(orderRequest.getWarehouse()).orElse(""),
+                String.valueOf(orderRequest.getType()),
+                Optional.ofNullable(orderRequest.getOrderTid()).orElse(""),
+                Optional.ofNullable(orderRequest.getReceiveName()).orElse(""),
+                Optional.ofNullable(orderRequest.getPhone()).orElse(""),
+                String.valueOf(orderRequest.getTimestamp()),
+                itemDetails);
+
+    }
+
+
 
 }
