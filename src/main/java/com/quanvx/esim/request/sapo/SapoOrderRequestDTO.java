@@ -11,7 +11,6 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-
 public class SapoOrderRequestDTO {
 
     private Long id;
@@ -78,6 +77,7 @@ public class SapoOrderRequestDTO {
     @JsonProperty("shipping_address")
     private Address shippingAddress;
     private Customer customer;
+    @JsonProperty("line_items")
     private List<LineItem> lineItems;
     @JsonProperty("shipping_lines")
     private List<ShippingLine> shippingLines;

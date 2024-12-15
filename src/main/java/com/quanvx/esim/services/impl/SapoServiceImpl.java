@@ -1,8 +1,12 @@
 package com.quanvx.esim.services.impl;
 
 import com.quanvx.esim.config.AppConfig;
+import com.quanvx.esim.entity.CustomerEntity;
+import com.quanvx.esim.entity.LineItemEntity;
 import com.quanvx.esim.entity.SapoOrderEntity;
 import com.quanvx.esim.mapper.SapoOrderMapper;
+import com.quanvx.esim.repository.CustomerRepository;
+import com.quanvx.esim.repository.LineItemRepository;
 import com.quanvx.esim.repository.SapoOrderRepository;
 import com.quanvx.esim.request.joytel.OrderRequestDTO;
 import com.quanvx.esim.request.sapo.SapoOrderRequestDTO;
@@ -32,6 +36,10 @@ public class SapoServiceImpl implements SapoService {
     private AppConfig appConfig;
     @Autowired
     private SapoOrderRepository sapoOrderRepository;
+    @Autowired
+    private CustomerRepository customerRepository;
+    @Autowired
+    private LineItemRepository lineItemRepository;
     private static final Logger log = LoggerFactory.getLogger(SapoServiceImpl.class);
 
     @Override
@@ -44,12 +52,28 @@ public class SapoServiceImpl implements SapoService {
 
         // Save to Database
         sapoOrder = sapoOrderRepository.save(sapoOrder);
+        // save customer
+
+        SapoOrderRequestDTO.Customer customer = req.getCustomer();
+        CustomerEntity customerEntity = SapoOrderMapper.INSTANCE.toEntity(customer);
+        customerEntity.setOrderId(sapoOrder.getDbId());
+        customerRepository.save(customerEntity);
+
+        // save product
+        List<SapoOrderRequestDTO.LineItem> lineItems = req.getLineItems();
+        List<LineItemEntity> lineItemEntities = SapoOrderMapper.INSTANCE.mapLineItems(lineItems);
+        SapoOrderEntity finalSapoOrder = sapoOrder;
+        lineItemEntities.forEach(e -> e.setOrderId(finalSapoOrder.getDbId()));
+        lineItemRepository.saveAll(lineItemEntities);
 
         // mock data joytel
         JoytelResponse<OrderResponse> res = joytel.orderJoytel(mockDateJoytel(req));
         log.info(Optional.ofNullable(res).orElse(new JoytelResponse<>()).toString());
-
-
+        if(res.getCode() == 0 && res.getData() != null) {
+            sapoOrder.setOrderTid(res.getData().getOrderTid());
+            sapoOrder.setOrderCode(res.getData().getOrderCode());
+            sapoOrderRepository.save(sapoOrder);
+        }
         log.info("------ end handle hookOrderCreate");
     }
 

@@ -112,5 +112,11 @@ public class SapoOrderEntity {
     private double subTotalPrice;
     @Column(name = "subtotal_price")
     private double subtotalPrice;
+
+    @Column(name = "order_tid")
+    private String orderTid;
+
+    @Column(name = "order_code")
+    private String orderCode;
 }
 

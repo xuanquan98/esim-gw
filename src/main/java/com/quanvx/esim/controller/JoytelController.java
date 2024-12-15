@@ -18,24 +18,6 @@ public class JoytelController {
     @Autowired
     private RestTemplate restTemplate;
 
-    // API endpoint của Gateway
-    @GetMapping("/gateway")
-    public String gateway(@RequestParam String url) {
-        // Gọi API từ URL đã nhận và trả về kết quả
-        return restTemplate.getForObject(url, String.class);
-    }
-
-    @GetMapping("/hello")
-    public ResponseEntity<?> hello() {
-        // Gọi API từ URL đã nhận và trả về kết quả
-        return ResponseEntity.ok().body("hello");
-    }
-
-    @GetMapping("/hello1")
-    public ResponseEntity<?> hello1() {
-        // Gọi API từ URL đã nhận và trả về kết quả
-        return ResponseEntity.ok().body("hello");
-    }
 
     @PostMapping("/sapo/hook/orders/create")
     public ResponseEntity<?> hookOrderCreate(@RequestBody SapoOrderRequestDTO req) {
