@@ -27,5 +27,13 @@ public class SHA1Encryption {
             throw new RuntimeException("Error encrypting string with SHA-1", e);
         }
     }
+
+    public static void main(String[] args) {
+        //customerCode+customerAuth+orderCode+orderTid+timestamp
+        String orderCode = "DD-241215-2988810";
+        String orderTid = "";
+        String input = "104931b3eF0cebb" + orderCode + orderTid + "1667807404146";
+        System.out.println(SHA1Encryption.encrypt(input));
+    }
 }
 

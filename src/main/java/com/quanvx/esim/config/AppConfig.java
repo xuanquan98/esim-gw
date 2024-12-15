@@ -18,5 +18,7 @@ public class AppConfig {
     private String joytelCustomerCode;
     @Value("${joytel.customer-auth}")
     private String joytelCustomerAuth;
+    @Value("${joytel.urlv2}")
+    private String joytelUrlV2;
 
 }
