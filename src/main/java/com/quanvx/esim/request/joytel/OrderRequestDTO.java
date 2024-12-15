@@ -25,6 +25,8 @@ public class OrderRequestDTO {
     private String warehouse;
     private String orderTid;
     private String orderCode;
+    String coupon;
+    Integer qrcodeType;
 
 
 

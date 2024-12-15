@@ -28,6 +28,30 @@ public class SHA1Encryption {
         }
     }
 
+    public static String encryptWithMD5(String input) {
+        try {
+            // Get an instance of the MD5 message digest
+            MessageDigest md = MessageDigest.getInstance("MD5");
+
+            // Compute the hash, which returns a byte array
+            byte[] hashBytes = md.digest(input.getBytes());
+
+            // Convert the byte array to a hexadecimal string
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hashBytes) {
+                // Convert byte to hex and append to the string
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) {
+                    hexString.append('0'); // Add leading zero if needed
+                }
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("MD5 algorithm not found", e);
+        }
+    }
+
     public static void main(String[] args) {
         //customerCode+customerAuth+orderCode+orderTid+timestamp
         String orderCode = "DD-241215-2988810";

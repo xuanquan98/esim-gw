@@ -72,11 +72,12 @@ public class SapoServiceImpl implements SapoService {
         // mock data joytel
         JoytelResponse<OrderResponse> res = joytel.orderJoytel(mockDateJoytel(req));
         log.info(Optional.ofNullable(res).orElse(new JoytelResponse<>()).toString());
-        if(res.getCode() == 0 && res.getData() != null) {
-            sapoOrder.setOrderTid(res.getData().getOrderTid());
-            sapoOrder.setOrderCode(res.getData().getOrderCode());
-            sapoOrderRepository.save(sapoOrder);
+        if(res == null || res.getCode() != 0 || res.getData() == null) {
+            return;
         }
+        sapoOrder.setOrderTid(res.getData().getOrderTid());
+        sapoOrder.setOrderCode(res.getData().getOrderCode());
+        sapoOrderRepository.save(sapoOrder);
 
         try {
             // Sleep for 1 minute (60,000 milliseconds)
@@ -93,13 +94,25 @@ public class SapoServiceImpl implements SapoService {
 
         JoytelResponse<OrderQueryResponse> responeQuery = joytel.orderJoytelQuery(mockDataOrderQuery(req, sapoOrder.getOrderTid(),sapoOrder.getOrderCode()));
         log.info(responeQuery.toString());
+        if(responeQuery.getCode() != 0 || responeQuery.getData() == null) {
+            return;
+        }
 
+        List<String> snPin = responeQuery.getData().getItemList()
+                .stream()
+                .flatMap(item -> item.getSnList().stream())
+                .map(OrderQueryResponse.Sn::getSnPin)
+                .toList();
 
+        log.info(snPin.toString());
         // genQR code
-
-
-
-
+        snPin.forEach(e -> {
+            OrderRequestDTO reqGenQr = new OrderRequestDTO();
+            reqGenQr.setCoupon(e);
+            reqGenQr.setQrcodeType(1);
+            JoytelResponse<OrderResponse> responseGenQR = joytel.genQrJoytel(reqGenQr);
+            log.info(responseGenQR.toString());
+        });
         log.info("------ end handle hookOrderCreate");
     }
 

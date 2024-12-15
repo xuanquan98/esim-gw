@@ -9,4 +9,6 @@ public interface JoytelService {
     JoytelResponse<OrderResponse> orderJoytel(OrderRequestDTO req);
 
     JoytelResponse<OrderQueryResponse> orderJoytelQuery(OrderRequestDTO req);
+
+    JoytelResponse<OrderResponse> genQrJoytel(OrderRequestDTO req);
 }

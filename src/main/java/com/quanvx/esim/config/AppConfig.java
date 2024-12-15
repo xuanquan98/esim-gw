@@ -22,5 +22,11 @@ public class AppConfig {
     private String joytelCustomerAuth;
     @Value("${joytel.urlv2}")
     private String joytelUrlV2;
+    @Value("${joytel.app-id}")
+    private String joytelAppId;
+    @Value("${joytel.app-secret}")
+    private String joytelAppSecret;
+    @Value("${joytel.urlv2.path-gen-qr}")
+    private String joytelPathGenQr;
 
 }
