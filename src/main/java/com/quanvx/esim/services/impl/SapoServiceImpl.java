@@ -16,6 +16,7 @@ import com.quanvx.esim.response.joytel.OrderResponse;
 import com.quanvx.esim.services.EncryptionService;
 import com.quanvx.esim.services.JoytelService;
 import com.quanvx.esim.services.SapoService;
+import com.quanvx.esim.utils.DatetimeUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -179,24 +180,13 @@ public class SapoServiceImpl implements SapoService {
         OrderRequestDTO orderRequest = new OrderRequestDTO();
         orderRequest.setCustomerCode(appConfig.getJoytelCustomerCode());
         orderRequest.setOrderCode(orderCode);
-        orderRequest.setTimestamp(getTimestamp());
+        orderRequest.setTimestamp(DatetimeUtil.getTimestamp());
         orderRequest.setOrderTid(orderTid);
         String str = appConfig.getJoytelCustomerCode() + appConfig.getJoytelCustomerAuth() + Optional.ofNullable(orderCode).orElse("") + Optional.ofNullable(orderTid).orElse("") + String.valueOf(orderRequest.getTimestamp());
         String autoGraph = encryptionService.sha1Encrypt(str);
         orderRequest.setAutoGraph(autoGraph);
 
         return orderRequest;
-    }
-
-
-
-    private long getTimestamp() {
-        // Current LocalDateTime
-        LocalDateTime localDateTime = LocalDateTime.now();
-
-        // Convert LocalDateTime to milliseconds since epoch
-        return localDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
-
     }
 
 

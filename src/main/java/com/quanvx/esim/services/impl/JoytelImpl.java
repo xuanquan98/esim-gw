@@ -6,6 +6,7 @@ import com.quanvx.esim.response.joytel.JoytelResponse;
 import com.quanvx.esim.response.joytel.OrderQueryResponse;
 import com.quanvx.esim.response.joytel.OrderResponse;
 import com.quanvx.esim.services.JoytelService;
+import com.quanvx.esim.utils.DatetimeUtil;
 import com.quanvx.esim.utils.SHA1Encryption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,10 +80,10 @@ public class JoytelImpl implements JoytelService {
 
     public HttpHeaders createHeaders(){
         // Generate unique TransId (could use UUID for uniqueness)
-        String transId = UUID.randomUUID().toString();
+        String transId = String.valueOf(DatetimeUtil.getTimestamp());
 
         // Generate the Timestamp (current time in milliseconds)
-        long timestamp = System.currentTimeMillis();
+        long timestamp = DatetimeUtil.getTimestamp();
 
         // Create the Ciphertext
         String dataToEncrypt = appConfig.getJoytelAppId() + transId + timestamp + appConfig.getJoytelAppSecret();
