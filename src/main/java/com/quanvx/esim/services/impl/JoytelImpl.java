@@ -32,7 +32,7 @@ public class JoytelImpl implements JoytelService {
             HttpEntity<OrderRequestDTO> entity = new HttpEntity<>(req);
             ResponseEntity<JoytelResponse<OrderResponse>> response =
                     restTemplate.exchange(
-                            String.format("%s%s", appConfig.getJoytelUrl(), appConfig.getJoytelUrlPathOrderQuery()),
+                            String.format("%s%s", appConfig.getJoytelUrl(), appConfig.getJoytelUrlPathOrder()),
                             HttpMethod.POST,
                             entity,
                             new ParameterizedTypeReference<JoytelResponse<OrderResponse>>() {});
