@@ -28,7 +28,7 @@ public class ProxyControllerV2 {
             HttpServletRequest request) {
 
         // Build the target URL dynamically
-        String requestURI = request.getRequestURI().substring("/proxy".length());
+        String requestURI = request.getRequestURI().substring("/proxyV2".length());
         String queryString = request.getQueryString();
         String url = appConfig.getJoytelUrlV2() + requestURI + (queryString != null ? "?" + queryString : "");
 
