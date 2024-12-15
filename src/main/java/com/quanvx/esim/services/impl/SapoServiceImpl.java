@@ -11,6 +11,7 @@ import com.quanvx.esim.repository.SapoOrderRepository;
 import com.quanvx.esim.request.joytel.OrderRequestDTO;
 import com.quanvx.esim.request.sapo.SapoOrderRequestDTO;
 import com.quanvx.esim.response.joytel.JoytelResponse;
+import com.quanvx.esim.response.joytel.OrderQueryResponse;
 import com.quanvx.esim.response.joytel.OrderResponse;
 import com.quanvx.esim.services.EncryptionService;
 import com.quanvx.esim.services.JoytelService;
@@ -20,6 +21,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -74,6 +77,29 @@ public class SapoServiceImpl implements SapoService {
             sapoOrder.setOrderCode(res.getData().getOrderCode());
             sapoOrderRepository.save(sapoOrder);
         }
+
+        try {
+            // Sleep for 1 minute (60,000 milliseconds)
+            Thread.sleep(60 * 1000);
+        } catch (InterruptedException e) {
+            // Handle interruption
+            Thread.currentThread().interrupt();
+            System.err.println("Sleep was interrupted: " + e.getMessage());
+        }
+
+        // Continue with processing
+        System.out.println("Processing data...");
+        // Add your data processing logic here
+
+        JoytelResponse<OrderQueryResponse> responeQuery = joytel.orderJoytelQuery(mockDataOrderQuery(req, sapoOrder.getOrderTid(),sapoOrder.getOrderCode()));
+        log.info(responeQuery.toString());
+
+
+        // genQR code
+
+
+
+
         log.info("------ end handle hookOrderCreate");
     }
 
@@ -84,10 +110,10 @@ public class SapoServiceImpl implements SapoService {
         orderRequest.setCustomerCode(appConfig.getJoytelCustomerCode());
         orderRequest.setType(3);
         orderRequest.setReceiveName("test");
-        orderRequest.setPhone("0965286001");
+        orderRequest.setPhone("0838866309");
         orderRequest.setTimestamp(1667807404146L);
         orderRequest.setRemark("test");
-        orderRequest.setEmail("hhd14tq@gmail.com");
+        orderRequest.setEmail("quanvu143@gmail.com");
 
         // Create the item list
         List<OrderRequestDTO.Item> items = new ArrayList<>();
@@ -133,6 +159,30 @@ public class SapoServiceImpl implements SapoService {
                 Optional.ofNullable(orderRequest.getPhone()).orElse(""),
                 String.valueOf(orderRequest.getTimestamp()),
                 itemDetails);
+
+    }
+
+    private OrderRequestDTO mockDataOrderQuery(SapoOrderRequestDTO req, String orderTid, String orderCode) {
+        OrderRequestDTO orderRequest = new OrderRequestDTO();
+        orderRequest.setCustomerCode(appConfig.getJoytelCustomerCode());
+        orderRequest.setOrderCode(orderCode);
+        orderRequest.setTimestamp(getTimestamp());
+        orderRequest.setOrderTid(orderTid);
+        String str = appConfig.getJoytelCustomerCode() + appConfig.getJoytelCustomerAuth() + Optional.ofNullable(orderCode).orElse("") + Optional.ofNullable(orderTid).orElse("") + String.valueOf(orderRequest.getTimestamp());
+        String autoGraph = encryptionService.sha1Encrypt(str);
+        orderRequest.setAutoGraph(autoGraph);
+
+        return orderRequest;
+    }
+
+
+
+    private long getTimestamp() {
+        // Current LocalDateTime
+        LocalDateTime localDateTime = LocalDateTime.now();
+
+        // Convert LocalDateTime to milliseconds since epoch
+        return localDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 
     }
 

@@ -3,6 +3,7 @@ package com.quanvx.esim.services.impl;
 import com.quanvx.esim.config.AppConfig;
 import com.quanvx.esim.request.joytel.OrderRequestDTO;
 import com.quanvx.esim.response.joytel.JoytelResponse;
+import com.quanvx.esim.response.joytel.OrderQueryResponse;
 import com.quanvx.esim.response.joytel.OrderResponse;
 import com.quanvx.esim.services.JoytelService;
 import org.slf4j.Logger;
@@ -31,7 +32,7 @@ public class JoytelImpl implements JoytelService {
             HttpEntity<OrderRequestDTO> entity = new HttpEntity<>(req);
             ResponseEntity<JoytelResponse<OrderResponse>> response =
                     restTemplate.exchange(
-                            String.format("%s%s", appConfig.getJoytelUrl(), appConfig.getJoytelUrlPathOrder()),
+                            String.format("%s%s", appConfig.getJoytelUrl(), appConfig.getJoytelUrlPathOrderQuery()),
                             HttpMethod.POST,
                             entity,
                             new ParameterizedTypeReference<JoytelResponse<OrderResponse>>() {});
@@ -39,4 +40,19 @@ public class JoytelImpl implements JoytelService {
         log.info(String.valueOf(response.getBody()));
         return response.getBody();
         }
+
+
+    @Override
+    public JoytelResponse<OrderQueryResponse> orderJoytelQuery(OrderRequestDTO req) {
+        HttpEntity<OrderRequestDTO> entity = new HttpEntity<>(req);
+        ResponseEntity<JoytelResponse<OrderQueryResponse>> response =
+                restTemplate.exchange(
+                        String.format("%s%s", appConfig.getJoytelUrl(), appConfig.getJoytelUrlPathOrderQuery()),
+                        HttpMethod.POST,
+                        entity,
+                        new ParameterizedTypeReference<JoytelResponse<OrderQueryResponse>>() {});
+        log.info("---------");
+        log.info(String.valueOf(response.getBody()));
+        return response.getBody();
+    }
     }

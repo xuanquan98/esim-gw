@@ -24,6 +24,7 @@ public class OrderRequestDTO {
     private List<Item> itemList;
     private String warehouse;
     private String orderTid;
+    private String orderCode;
 
 
 
