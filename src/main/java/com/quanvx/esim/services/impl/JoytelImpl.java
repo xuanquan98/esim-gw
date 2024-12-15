@@ -94,6 +94,9 @@ public class JoytelImpl implements JoytelService {
         headers.set("TransId", transId);
         headers.set("Timestamp", String.valueOf(timestamp));
         headers.set("Ciphertext", ciphertext);
+
+
+        log.info(headers.toString());
         return headers;
     }
 
