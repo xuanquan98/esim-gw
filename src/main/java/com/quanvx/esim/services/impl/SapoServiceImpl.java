@@ -84,10 +84,10 @@ public class SapoServiceImpl implements SapoService {
         orderRequest.setCustomerCode(appConfig.getJoytelCustomerCode());
         orderRequest.setType(3);
         orderRequest.setReceiveName("test");
-        orderRequest.setPhone("0838866309");
+        orderRequest.setPhone("0965286001");
         orderRequest.setTimestamp(1667807404146L);
         orderRequest.setRemark("test");
-        orderRequest.setEmail("quanvu143@gmail.com");
+        orderRequest.setEmail("hhd14tq@gmail.com");
 
         // Create the item list
         List<OrderRequestDTO.Item> items = new ArrayList<>();
