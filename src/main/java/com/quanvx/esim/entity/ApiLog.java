@@ -3,7 +3,6 @@ package com.quanvx.esim.entity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
@@ -17,19 +16,19 @@ public class ApiLog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "request_method")
+    @Column(name = "request_method", length = 50) // Specify length for request method
     private String requestMethod;
 
-    @Column(name = "request_url")
+    @Column(name = "request_url", length = 512) // Custom length for URL
     private String requestUrl;
 
-    @Column(name = "request_body")
+    @Column(name = "request_body", columnDefinition = "TEXT") // Use TEXT for larger content
     private String requestBody;
 
     @Column(name = "response_status")
     private int responseStatus;
 
-    @Column(name = "response_body")
+    @Column(name = "response_body", columnDefinition = "TEXT") // Use TEXT for larger content
     private String responseBody;
 
     @Column(name = "timestamp")

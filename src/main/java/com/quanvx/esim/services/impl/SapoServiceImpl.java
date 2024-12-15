@@ -1,6 +1,9 @@
 package com.quanvx.esim.services.impl;
 
 import com.quanvx.esim.config.AppConfig;
+import com.quanvx.esim.entity.SapoOrderEntity;
+import com.quanvx.esim.mapper.SapoOrderMapper;
+import com.quanvx.esim.repository.SapoOrderRepository;
 import com.quanvx.esim.request.joytel.OrderRequestDTO;
 import com.quanvx.esim.request.sapo.SapoOrderRequestDTO;
 import com.quanvx.esim.response.joytel.JoytelResponse;
@@ -27,12 +30,20 @@ public class SapoServiceImpl implements SapoService {
     private JoytelService joytel;
     @Autowired
     private AppConfig appConfig;
+    @Autowired
+    private SapoOrderRepository sapoOrderRepository;
     private static final Logger log = LoggerFactory.getLogger(SapoServiceImpl.class);
 
     @Override
     public void hookOrderCreate(SapoOrderRequestDTO req) {
         log.info("------ start handle hookOrderCreate");
         log.info(req.toString());
+        //save data to db
+        // Map DTO to Entity
+        SapoOrderEntity sapoOrder = SapoOrderMapper.INSTANCE.toEntity(req);
+
+        // Save to Database
+        sapoOrder = sapoOrderRepository.save(sapoOrder);
 
         // mock data joytel
         JoytelResponse<OrderResponse> res = joytel.orderJoytel(mockDateJoytel(req));
@@ -57,11 +68,11 @@ public class SapoServiceImpl implements SapoService {
         // Create the item list
         List<OrderRequestDTO.Item> items = new ArrayList<>();
         OrderRequestDTO.Item item1 = new OrderRequestDTO.Item();
-        item1.setProductCode("esim615xxxx1");
+        item1.setProductCode("eSIM-test");
         item1.setQuantity(1);
 
         OrderRequestDTO.Item item2 = new OrderRequestDTO.Item();
-        item2.setProductCode("esim615xxxx2");
+        item2.setProductCode("eSIM-test");
         item2.setQuantity(1);
 
         // Add items to the list

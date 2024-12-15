@@ -19,7 +19,7 @@ public class ApiLogServiceImpl implements ApiLogService {
     @Override
     public void saveApiLog(String requestMethod, String requestUrl, String requestBody, int responseStatus, String responseBody) {
         ApiLog apiLog = new ApiLog(requestMethod, requestUrl, requestBody, responseStatus, responseBody);
-        //apiLogRepository.save(apiLog);
+        apiLogRepository.save(apiLog);
     }
 }
 
