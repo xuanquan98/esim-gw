@@ -16,8 +16,8 @@ public class ProxyController {
 
    @Autowired
    private AppConfig appConfig;
-
-    private final RestTemplate restTemplate = new RestTemplate();
+@Autowired
+    private  RestTemplate restTemplate;
 
     @RequestMapping(value = "/**", method = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.PATCH})
     public ResponseEntity<?> proxyRequest(
