@@ -10,6 +10,7 @@ import lombok.*;
 public class JoytelResponse<T> {
 
    private String message;
+   private String mesg;
    private int code;
    private T data;
 }

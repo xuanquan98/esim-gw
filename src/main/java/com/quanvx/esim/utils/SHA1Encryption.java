@@ -56,8 +56,8 @@ public class SHA1Encryption {
         //customerCode+customerAuth+orderCode+orderTid+timestamp
         String orderCode = "DD-241215-2988810";
         String orderTid = "";
-        String input = "104931b3eF0cebb" + orderCode + orderTid + "1667807404146";
-        System.out.println(SHA1Encryption.encrypt(input));
+        String input = "OYchK08ITbIO7a0d7eef-2150-4f7c-ab31-829ea59333f5173437241460928476F0481E5424F8EA22D37C80C0CE3s";
+        System.out.println(SHA1Encryption.encryptWithMD5(input));
     }
 }
 
