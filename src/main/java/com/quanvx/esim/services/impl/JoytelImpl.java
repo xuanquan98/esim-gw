@@ -80,7 +80,7 @@ public class JoytelImpl implements JoytelService {
 
     public HttpHeaders createHeaders(){
         // Generate unique TransId (could use UUID for uniqueness)
-        String transId = String.valueOf(DatetimeUtil.getTimestamp());
+        String transId = UUID.randomUUID().toString();
 
         // Generate the Timestamp (current time in milliseconds)
         long timestamp = DatetimeUtil.getTimestamp();
@@ -95,7 +95,6 @@ public class JoytelImpl implements JoytelService {
         headers.set("TransId", transId);
         headers.set("Timestamp", String.valueOf(timestamp));
         headers.set("Ciphertext", ciphertext);
-
 
         log.info(headers.toString());
         return headers;
