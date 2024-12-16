@@ -38,7 +38,13 @@ public class LoggingInterceptor implements ClientHttpRequestInterceptor {
 
         // Log the response
         int responseStatus = bufferedResponse.getStatusCode().value();
-        String responseBody = new String(bufferedResponse.getBody().readAllBytes(), StandardCharsets.UTF_8);
+        //String responseBody = new String(bufferedResponse.getBody().readAllBytes(), StandardCharsets.UTF_8);
+        String responseBody = new String(
+                new String(bufferedResponse.getBody().readAllBytes(), StandardCharsets.ISO_8859_1)
+                        .replace("\u0000", "") // Remove null bytes
+                        .getBytes(StandardCharsets.ISO_8859_1),
+                StandardCharsets.UTF_8
+        );
 
         // Save the log to the database
         apiLogService.saveApiLog(requestMethod, requestUrl, requestBody, responseStatus, responseBody);
