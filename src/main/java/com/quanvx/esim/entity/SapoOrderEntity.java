@@ -1,8 +1,10 @@
 package com.quanvx.esim.entity;
 
+import com.quanvx.esim.constant.enums.EnumStatusOrder;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -118,5 +120,10 @@ public class SapoOrderEntity {
 
     @Column(name = "order_code")
     private String orderCode;
+
+    private LocalDateTime timeCheckQuery;
+
+    @Enumerated(EnumType.STRING)
+    private EnumStatusOrder enumStatusOrder;
 }
 

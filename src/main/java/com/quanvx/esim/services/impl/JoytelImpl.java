@@ -2,6 +2,7 @@ package com.quanvx.esim.services.impl;
 
 import com.quanvx.esim.config.AppConfig;
 import com.quanvx.esim.request.joytel.OrderRequestDTO;
+import com.quanvx.esim.response.joytel.GenQrResponse;
 import com.quanvx.esim.response.joytel.JoytelResponse;
 import com.quanvx.esim.response.joytel.OrderQueryResponse;
 import com.quanvx.esim.response.joytel.OrderResponse;
@@ -73,6 +74,21 @@ public class JoytelImpl implements JoytelService {
                         HttpMethod.POST,
                         entity,
                         new ParameterizedTypeReference<JoytelResponse<OrderResponse>>() {});
+        log.info("---------");
+        log.info(String.valueOf(response.getBody()));
+        return response.getBody();
+    }
+
+    @Override
+    public JoytelResponse<GenQrResponse> getQrJoytel(OrderRequestDTO req) {
+        HttpEntity<OrderRequestDTO> entity = new HttpEntity<>(req, createHeaders());
+
+        ResponseEntity<JoytelResponse<GenQrResponse>> response =
+                restTemplate.exchange(
+                        String.format("%s%s", appConfig.getJoytelUrlV2(), appConfig.getJoytelPathGenQr()),
+                        HttpMethod.POST,
+                        entity,
+                        new ParameterizedTypeReference<JoytelResponse<GenQrResponse>>() {});
         log.info("---------");
         log.info(String.valueOf(response.getBody()));
         return response.getBody();
