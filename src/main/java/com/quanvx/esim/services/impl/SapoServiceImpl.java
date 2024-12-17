@@ -80,7 +80,7 @@ public class SapoServiceImpl implements SapoService {
         List<EsimEntity> esimEntities = new ArrayList<>();
         SapoOrderEntity finalSapoOrder1 = sapoOrder;
         req.getLineItems().forEach(e -> {
-            IntStream.range(0, esimEntities.size()).forEach(i -> {
+            IntStream.range(0, req.getLineItems().size()).forEach(i -> {
                 EsimEntity esim = new EsimEntity();
                 esim.setOrderId(finalSapoOrder1.getDbId());
                 esim.setEnumStatusOrder(EnumStatusOrder.INIT);
