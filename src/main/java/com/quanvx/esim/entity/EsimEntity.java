@@ -34,6 +34,17 @@ public class EsimEntity {
     private LocalDateTime timeCheckQuery;
     @Enumerated(EnumType.STRING)
     private EnumStatusOrder enumStatusOrder;
+    private String transId;
+    private String coupon;
+    private Integer qrcodeType;
+    private String qrcode;
+    private String cid;
+    private String salePlanName;
+    private Integer salePlanDays;
+    private String pin1;
+    private String pin2;
+    private String puk1;
+    private String puk2;
 
 }
 

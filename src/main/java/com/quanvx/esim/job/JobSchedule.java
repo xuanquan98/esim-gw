@@ -25,6 +25,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.IntStream;
 
 @Service
@@ -48,7 +49,7 @@ public class JobSchedule {
         log.info("Job is running every 1 minutes: " + java.time.LocalDateTime.now());
         log.info("------- runJobGetOrderQuery ---------");
         //get order
-        List<SapoOrderEntity> orderEntities = orderRepository.findAllByEnumStatusOrderAndTimeCheckQueryBefore(EnumStatusOrder.SEND_JOYTEL_SUCESS, LocalDateTime.now().minusMinutes(1));
+        List<SapoOrderEntity> orderEntities = orderRepository.findAllByEnumStatusOrderAndTimeCheckQueryBefore(EnumStatusOrder.SEND_JOYTEL_SUCCESS, LocalDateTime.now().minusMinutes(1));
         // cac order
         log.info(orderEntities.toString());
         orderEntities.forEach(order -> {
@@ -89,10 +90,23 @@ public class JobSchedule {
             // genQR code
             snPin.forEach(e -> {
                 OrderRequestDTO reqGenQr = new OrderRequestDTO();
+                String transId = UUID.randomUUID().toString();
                 reqGenQr.setCoupon(e);
                 reqGenQr.setQrcodeType(1);
-                JoytelResponse<OrderResponse> responseGenQR = joytel.genQrJoytel(reqGenQr);
+                JoytelResponse<OrderResponse> responseGenQR = joytel.genQrJoytel(reqGenQr, transId);
+                EsimEntity esim = esimRepository.findFirstBySnPin(e);
+                esim.setTransId(transId);
+                esim.setTimeCheckQuery(LocalDateTime.now().plusMinutes(1));
+
+                if(responseGenQR != null) {
+                    esim.setEnumStatusOrder(EnumStatusOrder.SEND_JOYTEL_SUCCESS);
+                } else {
+                    esim.setEnumStatusOrder(EnumStatusOrder.SEND_JOYTEL_FAIL);
+                }
                 log.info(responseGenQR.toString());
+                esimRepository.save(esim);
+
+
             });
         });
 

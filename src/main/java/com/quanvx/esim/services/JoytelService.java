@@ -11,7 +11,7 @@ public interface JoytelService {
 
     JoytelResponse<OrderQueryResponse> orderJoytelQuery(OrderRequestDTO req);
 
-    JoytelResponse<OrderResponse> genQrJoytel(OrderRequestDTO req);
+    JoytelResponse<OrderResponse> genQrJoytel(OrderRequestDTO req, String transId);
 
-    JoytelResponse<GenQrResponse> getQrJoytel(OrderRequestDTO req);
+    JoytelResponse<GenQrResponse> getQrJoytel(OrderRequestDTO req, String transId);
 }

@@ -103,7 +103,7 @@ public class SapoServiceImpl implements SapoService {
         sapoOrder.setOrderTid(res.getData().getOrderTid());
         sapoOrder.setOrderCode(res.getData().getOrderCode());
         sapoOrder.setTimeCheckQuery(LocalDateTime.now().plusMinutes(1));
-        sapoOrder.setEnumStatusOrder(EnumStatusOrder.SEND_JOYTEL_FAIL);
+        sapoOrder.setEnumStatusOrder(EnumStatusOrder.SEND_JOYTEL_SUCCESS);
         sapoOrderRepository.save(sapoOrder);
         log.info("------ end handle hookOrderCreate");
     }

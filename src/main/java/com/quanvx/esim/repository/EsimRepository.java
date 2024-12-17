@@ -10,4 +10,5 @@ import java.util.List;
 @Repository
 public interface EsimRepository extends JpaRepository<EsimEntity, Long> {
     List<EsimEntity> findAllByOrderId(Long orderId);
+    EsimEntity findFirstBySnPin(String snPin);
 }

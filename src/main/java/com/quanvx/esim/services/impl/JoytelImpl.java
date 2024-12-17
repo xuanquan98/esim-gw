@@ -20,8 +20,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.UUID;
-
 @Service
 public class JoytelImpl implements JoytelService {
 
@@ -65,8 +63,8 @@ public class JoytelImpl implements JoytelService {
 
 
     @Override
-    public JoytelResponse<OrderResponse> genQrJoytel(OrderRequestDTO req) {
-        HttpEntity<OrderRequestDTO> entity = new HttpEntity<>(req, createHeaders());
+    public JoytelResponse<OrderResponse> genQrJoytel(OrderRequestDTO req, String transId) {
+        HttpEntity<OrderRequestDTO> entity = new HttpEntity<>(req, createHeaders(transId));
 
         ResponseEntity<JoytelResponse<OrderResponse>> response =
                 restTemplate.exchange(
@@ -80,8 +78,8 @@ public class JoytelImpl implements JoytelService {
     }
 
     @Override
-    public JoytelResponse<GenQrResponse> getQrJoytel(OrderRequestDTO req) {
-        HttpEntity<OrderRequestDTO> entity = new HttpEntity<>(req, createHeaders());
+    public JoytelResponse<GenQrResponse> getQrJoytel(OrderRequestDTO req, String transId) {
+        HttpEntity<OrderRequestDTO> entity = new HttpEntity<>(req, createHeaders(transId));
 
         ResponseEntity<JoytelResponse<GenQrResponse>> response =
                 restTemplate.exchange(
@@ -94,10 +92,7 @@ public class JoytelImpl implements JoytelService {
         return response.getBody();
     }
 
-    public HttpHeaders createHeaders(){
-        // Generate unique TransId (could use UUID for uniqueness)
-        String transId = UUID.randomUUID().toString();
-
+    public HttpHeaders createHeaders(String transId){
         // Generate the Timestamp (current time in milliseconds)
         long timestamp = DatetimeUtil.getTimestamp();
 
