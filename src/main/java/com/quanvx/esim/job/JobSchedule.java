@@ -8,6 +8,7 @@ import com.quanvx.esim.repository.EsimRepository;
 import com.quanvx.esim.repository.SapoOrderRepository;
 import com.quanvx.esim.request.joytel.OrderRequestDTO;
 import com.quanvx.esim.request.sapo.SapoOrderRequestDTO;
+import com.quanvx.esim.response.joytel.GenQrResponse;
 import com.quanvx.esim.response.joytel.JoytelResponse;
 import com.quanvx.esim.response.joytel.OrderQueryResponse;
 import com.quanvx.esim.response.joytel.OrderResponse;
@@ -63,6 +64,9 @@ public class JobSchedule {
                 return;
             }
 
+            order.setEnumStatusOrder(EnumStatusOrder.GET_JOYTEL_QUERY_SUCCESS);
+            orderRepository.save(order);
+
             List<EsimEntity> esimEntities = esimRepository.findAllByOrderId(order.getDbId());
             // save snCode to entity
             responeQuery.getData().getItemList().forEach(res -> {
@@ -97,7 +101,7 @@ public class JobSchedule {
                 JoytelResponse<OrderResponse> responseGenQR = joytel.genQrJoytel(reqGenQr, transId);
                 EsimEntity esim = esimRepository.findFirstBySnPin(e);
                 esim.setTransId(transId);
-                esim.setTimeCheckQuery(LocalDateTime.now().plusMinutes(1));
+                esim.setTimeCheckQuery(LocalDateTime.now());
 
                 if(responseGenQR != null) {
                     esim.setEnumStatusOrder(EnumStatusOrder.SEND_JOYTEL_SUCCESS);
@@ -122,6 +126,38 @@ public class JobSchedule {
         orderRequest.setAutoGraph(autoGraph);
 
         return orderRequest;
+    }
+
+    @Scheduled(cron = "0 */1 * * * *") // Every 3 minutes
+    public void runJobGetQRQuery() {
+        log.info("Job is running every 1 minutes: " + java.time.LocalDateTime.now());
+        log.info("------- runJobGetQRQuery ---------");
+        //get order
+        List<EsimEntity> esims = esimRepository.findAllByEnumStatusOrderAndTimeCheckQueryBefore(EnumStatusOrder.SEND_JOYTEL_SUCCESS, LocalDateTime.now().minusMinutes(1));
+        log.info(esims.toString());
+        esims.forEach(esim -> {
+            OrderRequestDTO reqGenQr = new OrderRequestDTO();
+            reqGenQr.setQTransId(esim.getTransId());
+            String transId = UUID.randomUUID().toString();
+            JoytelResponse<GenQrResponse> res = joytel.getQrJoytel(reqGenQr, transId);
+            if(res != null) {
+                esim.setQrcode(res.getData().getQrcode());
+                esim.setPin2(res.getData().getPin2());
+                esim.setPin1(res.getData().getPin1());
+                esim.setPuk1(res.getData().getPuk1());
+                esim.setPuk2(res.getData().getPuk2());
+                esim.setSalePlanName(res.getData().getSalePlanName());
+                esim.setSalePlanDays(res.getData().getSalePlanDays());
+                esim.setCid(res.getData().getCid());
+                esim.setEnumStatusOrder(EnumStatusOrder.GET_JOYTEL_QUERY_SUCCESS);
+                esimRepository.save(esim);
+                return;
+            }
+            esim.setEnumStatusOrder(EnumStatusOrder.GET_JOYTEL_QUERY_FAIL);
+            esimRepository.save(esim);
+        });
+        //
+        log.info("------- end runJobGetQRQuery ---------");
     }
 
 }

@@ -12,5 +12,10 @@ public class GenQrResponse {
     private Integer qrcodeType;
     private String qrcode;
     private String salePlanName;
-    private String salePlanDays;
+    private Integer salePlanDays;
+    private String cid;
+    private String pin1;
+    private String pin2;
+    private String puk1;
+    private String puk2;
 }
