@@ -29,6 +29,6 @@ public class AppConfig {
     @Value("${joytel.urlv2.path-gen-qr}")
     private String joytelPathGenQr;
     @Value("${joytel.urlv2.path-get-qr}")
-    private String getJoytelPathGetQr;
+    private String joytelPathGetQr;
 
 }
