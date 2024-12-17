@@ -27,6 +27,7 @@ public class OrderRequestDTO {
     private String orderCode;
     private String coupon;
     private Integer qrcodeType;
+    @JsonProperty("qTransId")
     private String qTransId;
 
 
