@@ -83,7 +83,7 @@ public class JoytelImpl implements JoytelService {
 
         ResponseEntity<JoytelResponse<GenQrResponse>> response =
                 restTemplate.exchange(
-                        String.format("%s%s", appConfig.getJoytelUrlV2(), appConfig.getJoytelPathGenQr()),
+                        String.format("%s%s", appConfig.getJoytelUrlV2(), appConfig.getJoytelPathGetQr()),
                         HttpMethod.POST,
                         entity,
                         new ParameterizedTypeReference<JoytelResponse<GenQrResponse>>() {});
