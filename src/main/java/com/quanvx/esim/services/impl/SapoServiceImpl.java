@@ -102,7 +102,7 @@ public class SapoServiceImpl implements SapoService {
         }
         sapoOrder.setOrderTid(res.getData().getOrderTid());
         sapoOrder.setOrderCode(res.getData().getOrderCode());
-        sapoOrder.setTimeCheckQuery(LocalDateTime.now().plusMinutes(1));
+        sapoOrder.setTimeCheckQuery(LocalDateTime.now());
         sapoOrder.setEnumStatusOrder(EnumStatusOrder.SEND_JOYTEL_SUCCESS);
         sapoOrderRepository.save(sapoOrder);
         log.info("------ end handle hookOrderCreate");
@@ -170,7 +170,6 @@ public class SapoServiceImpl implements SapoService {
         String str = appConfig.getJoytelCustomerCode() + appConfig.getJoytelCustomerAuth() + Optional.ofNullable(orderCode).orElse("") + Optional.ofNullable(orderTid).orElse("") + String.valueOf(orderRequest.getTimestamp());
         String autoGraph = encryptionService.sha1Encrypt(str);
         orderRequest.setAutoGraph(autoGraph);
-
         return orderRequest;
     }
 

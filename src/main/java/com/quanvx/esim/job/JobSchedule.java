@@ -66,10 +66,11 @@ public class JobSchedule {
             List<EsimEntity> esimEntities = esimRepository.findAllByOrderId(order.getDbId());
             // save snCode to entity
             responeQuery.getData().getItemList().forEach(res -> {
-                List<EsimEntity> lstEsim = esimEntities.stream().filter(e -> Objects.equals(e.getProductCode(), res.getProductCode()) && e.getSnCode().isEmpty()).toList();
+                List<EsimEntity> lstEsim = esimEntities.stream().filter(e -> Objects.equals(e.getProductCode(), res.getProductCode()) && e.getSnCode() == null).toList();
                 IntStream.range(0, res.getSnList().size())
                         .forEach(index -> {
                             OrderQueryResponse.Sn data = res.getSnList().get(index);
+                            if(data == null) return;
                             EsimEntity esim = lstEsim.get(index);
                             esim.setSnCode(data.getSnCode());
                             esim.setSnPin(data.getSnPin());
@@ -105,8 +106,6 @@ public class JobSchedule {
                 }
                 log.info(responseGenQR.toString());
                 esimRepository.save(esim);
-
-
             });
         });
 
