@@ -12,6 +12,7 @@ import com.quanvx.esim.response.joytel.GenQrResponse;
 import com.quanvx.esim.response.joytel.JoytelResponse;
 import com.quanvx.esim.response.joytel.OrderQueryResponse;
 import com.quanvx.esim.response.joytel.OrderResponse;
+import com.quanvx.esim.services.EmailService;
 import com.quanvx.esim.services.EncryptionService;
 import com.quanvx.esim.services.JoytelService;
 import com.quanvx.esim.services.impl.SapoServiceImpl;
@@ -42,6 +43,9 @@ public class JobSchedule {
     private AppConfig appConfig;
     @Autowired
     private EsimRepository esimRepository;
+
+    @Autowired
+    private EmailService emailService;
 
     private static final Logger log = LoggerFactory.getLogger(JobSchedule.class);
 
@@ -97,7 +101,7 @@ public class JobSchedule {
                 OrderRequestDTO reqGenQr = new OrderRequestDTO();
                 String transId = UUID.randomUUID().toString();
                 reqGenQr.setCoupon(e);
-                reqGenQr.setQrcodeType(1);
+                reqGenQr.setQrcodeType(0);
                 JoytelResponse<OrderResponse> responseGenQR = joytel.genQrJoytel(reqGenQr, transId);
                 EsimEntity esim = esimRepository.findFirstBySnPin(e);
                 esim.setTransId(transId);
@@ -151,6 +155,7 @@ public class JobSchedule {
                 esim.setCid(res.getData().getCid());
                 esim.setEnumStatusOrder(EnumStatusOrder.GET_JOYTEL_QUERY_SUCCESS);
                 esimRepository.save(esim);
+                emailService.sendMailQr(esim);
                 return;
             }
             esim.setEnumStatusOrder(EnumStatusOrder.GET_JOYTEL_QUERY_FAIL);

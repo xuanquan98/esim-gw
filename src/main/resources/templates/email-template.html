@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>eSIM Order Information</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        h1 {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .note {
+            font-size: 12px;
+            font-style: italic;
+            color: gray;
+        }
+        .qr-code {
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<h1>Dear Customer.</h1>
+<p>
+    Thank you for choosing our eSIM Service. Below is your order information, including an eSIM QR Code.
+    Scan the QR code with your device camera and follow the prompts to get started.
+</p>
+<p>
+    Be sure to download your eSIM service onto your device within <strong>30 DAYS</strong>, or it will expire.
+    Your new data package will be activated automatically, once it is installed on your device.
+    The Calendar Day in <strong>TimeZone UTC +08:00</strong> is applied on the validation date.
+</p>
+<p>
+    When you arrive at the destination, turn on data roaming on your cell phone settings and enjoy a fast and stable Internet connection.
+</p>
+
+<p class="note">NOTE: Please do not reply to this email</p>
+
+<!-- Order Table -->
+<table>
+    <tr>
+        <th>Order ID</th>
+        <td th:text="${orderID}"></td>
+    </tr>
+    <tr>
+        <th>Order Time</th>
+        <td th:text="${orderTime}"></td>
+    </tr>
+    <tr>
+        <th>SN</th>
+        <td th:text="${sn}"></td>
+    </tr>
+    <tr>
+        <th>PIN</th>
+        <td th:text="${pin}"></td>
+    </tr>
+    <tr>
+        <th>PUK</th>
+        <td th:text="${puk}"></td>
+    </tr>
+<!--    <tr>-->
+<!--        <th>SM-DP+ Address</th>-->
+<!--        <td th:text="${smdpAddress}"></td>-->
+<!--    </tr>-->
+<!--    <tr>-->
+<!--        <th>Activation Code</th>-->
+<!--        <td th:text="${activationCode}"></td>-->
+<!--    </tr>-->
+<!--    <tr>-->
+<!--        <th>SM-DP+ Address & Activation Code</th>-->
+<!--        <td th:text="${fullActivationCode}"></td>-->
+<!--    </tr>-->
+</table>
+
+<!-- QR Code Section -->
+<div class="qr-code">
+    <p><strong>QR Code</strong></p>
+    <img th:src="@{${qrCodeImage}}" alt="QR Code" />
+</div>
+</body>
+</html>
