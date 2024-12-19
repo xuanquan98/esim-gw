@@ -69,7 +69,7 @@ public class SapoServiceImpl implements SapoService {
         customerRepository.save(customerEntity);
 
         // save product
-        List<SapoOrderRequestDTO.LineItem> lineItems = req.getLineItems().stream().filter(e -> getJoytelCode(e.getSku(), codeMapping) != null).toList();
+        List<SapoOrderRequestDTO.LineItem> lineItems = req.getLineItems();
         List<LineItemEntity> lineItemEntities = SapoOrderMapper.INSTANCE.mapLineItems(lineItems);
         SapoOrderEntity finalSapoOrder = sapoOrder;
         lineItemEntities.forEach(e -> e.setOrderId(finalSapoOrder.getDbId()));
@@ -92,7 +92,7 @@ public class SapoServiceImpl implements SapoService {
         esimRepository.saveAll(esimEntities);
 
         // mock data joytel
-        JoytelResponse<OrderResponse> res = joytel.orderJoytel(mockDateJoytel(req));
+        JoytelResponse<OrderResponse> res = joytel.orderJoytel(mockDateJoytel(req, codeMapping));
         log.info(Optional.ofNullable(res).orElse(new JoytelResponse<>()).toString());
         if (res == null || res.getCode() != 0 || res.getData() == null) {
             sapoOrder.setEnumStatusOrder(EnumStatusOrder.SEND_JOYTEL_FAIL);
@@ -108,7 +108,7 @@ public class SapoServiceImpl implements SapoService {
     }
 
 
-    private OrderRequestDTO mockDateJoytel(SapoOrderRequestDTO req) {
+    private OrderRequestDTO mockDateJoytel(SapoOrderRequestDTO req,List<CodeMappingEntity> codeMapping) {
         // Create the main DTO object
         OrderRequestDTO orderRequest = new OrderRequestDTO();
         orderRequest.setCustomerCode(appConfig.getJoytelCustomerCode());
@@ -120,9 +120,9 @@ public class SapoServiceImpl implements SapoService {
         orderRequest.setEmail("hhd14tq@gmail.com");
 
         // Create the item list
-        List<OrderRequestDTO.Item> items = req.getLineItems().stream().map(e -> {
+        List<OrderRequestDTO.Item> items = req.getLineItems().stream().filter(e -> getJoytelCode(e.getSku(), codeMapping) != null).map(e -> {
             OrderRequestDTO.Item item1 = new OrderRequestDTO.Item();
-            item1.setProductCode("eSIM-test");
+            item1.setProductCode(getJoytelCode(e.getSku(), codeMapping));
             item1.setQuantity(e.getQuantity());
             return item1;
         }).toList();
