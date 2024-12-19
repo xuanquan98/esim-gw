@@ -2,15 +2,9 @@ package com.quanvx.esim.services.impl;
 
 import com.quanvx.esim.config.AppConfig;
 import com.quanvx.esim.constant.enums.EnumStatusOrder;
-import com.quanvx.esim.entity.CustomerEntity;
-import com.quanvx.esim.entity.EsimEntity;
-import com.quanvx.esim.entity.LineItemEntity;
-import com.quanvx.esim.entity.SapoOrderEntity;
+import com.quanvx.esim.entity.*;
 import com.quanvx.esim.mapper.SapoOrderMapper;
-import com.quanvx.esim.repository.CustomerRepository;
-import com.quanvx.esim.repository.EsimRepository;
-import com.quanvx.esim.repository.LineItemRepository;
-import com.quanvx.esim.repository.SapoOrderRepository;
+import com.quanvx.esim.repository.*;
 import com.quanvx.esim.request.joytel.OrderRequestDTO;
 import com.quanvx.esim.request.sapo.SapoOrderRequestDTO;
 import com.quanvx.esim.response.joytel.JoytelResponse;
@@ -30,6 +24,7 @@ import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -51,12 +46,16 @@ public class SapoServiceImpl implements SapoService {
     private LineItemRepository lineItemRepository;
     @Autowired
     private EsimRepository esimRepository;
+    @Autowired
+    private CodeMappingRepository codeMappingRepository;
     private static final Logger log = LoggerFactory.getLogger(SapoServiceImpl.class);
 
     @Override
     public void hookOrderCreate(SapoOrderRequestDTO req) {
         log.info("------ start handle hookOrderCreate");
         log.info(req.toString());
+
+        List<CodeMappingEntity> codeMapping = codeMappingRepository.findAll();
         //save data to db
         // Map DTO to Entity
         SapoOrderEntity sapoOrder = SapoOrderMapper.INSTANCE.toEntity(req);
@@ -70,7 +69,7 @@ public class SapoServiceImpl implements SapoService {
         customerRepository.save(customerEntity);
 
         // save product
-        List<SapoOrderRequestDTO.LineItem> lineItems = req.getLineItems();
+        List<SapoOrderRequestDTO.LineItem> lineItems = req.getLineItems().stream().filter(e -> getJoytelCode(e.getSku(), codeMapping) != null).toList();
         List<LineItemEntity> lineItemEntities = SapoOrderMapper.INSTANCE.mapLineItems(lineItems);
         SapoOrderEntity finalSapoOrder = sapoOrder;
         lineItemEntities.forEach(e -> e.setOrderId(finalSapoOrder.getDbId()));
@@ -79,12 +78,12 @@ public class SapoServiceImpl implements SapoService {
         //save esim
         List<EsimEntity> esimEntities = new ArrayList<>();
         SapoOrderEntity finalSapoOrder1 = sapoOrder;
-        req.getLineItems().forEach(e -> {
+        req.getLineItems().stream().filter(e -> getJoytelCode(e.getSku(), codeMapping) != null).forEach(e -> {
             IntStream.range(0, e.getQuantity()).forEach(i -> {
                 EsimEntity esim = new EsimEntity();
                 esim.setOrderId(finalSapoOrder1.getDbId());
                 esim.setEnumStatusOrder(EnumStatusOrder.INIT);
-                esim.setProductCode("eSIM-test");
+                esim.setProductCode(getJoytelCode(e.getSku(), codeMapping));
                 esim.setProductName("eSIM-test");
                 esim.setSapoName(e.getName());
                 esimEntities.add(esim);
@@ -139,6 +138,7 @@ public class SapoServiceImpl implements SapoService {
 
 
     }
+
     private String getCustomString(OrderRequestDTO orderRequest) {
         // Concatenate itemList details
         String itemDetails = orderRequest.getItemList().stream()
@@ -156,6 +156,15 @@ public class SapoServiceImpl implements SapoService {
                 Optional.ofNullable(orderRequest.getPhone()).orElse(""),
                 String.valueOf(orderRequest.getTimestamp()),
                 itemDetails);
+
+    }
+
+    private String getJoytelCode(String sku, List<CodeMappingEntity> codeMapping) {
+        List<CodeMappingEntity> code = codeMapping.stream().filter(e -> Objects.equals(e.getCodeSapo(), sku)).toList();
+        if (code.isEmpty()) {
+            return null;
+        }
+        return code.get(0).getCodeJoytel();
 
     }
 }
