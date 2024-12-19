@@ -65,6 +65,7 @@ public class EmailServiceImpl implements EmailService {
         Map<String, Object> variables = new HashMap<>();
         variables.put("orders", esims);
         variables.put("orderID", order.getOrderCode());
+        variables.put("orderTime", order.getTimeCheckQuery().toString());
         try {
             sendEmail(mailTo, subject, "email-template", variables);
             order.setEnumStatusOrder(EnumStatusOrder.SEND_MAIL_SUCCESS);
