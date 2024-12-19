@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -19,9 +20,9 @@ public class SyncController {
     private CodeMappingRepository codeMappingRepository;
 
     @PostMapping("/sync/code_mapping")
-    public ResponseEntity<String> syncCodeMapping(@RequestBody CodeMappingEntity req) {
+    public ResponseEntity<String> syncCodeMapping(@RequestBody List<CodeMappingEntity> req) {
         codeMappingRepository.deleteAll();
-        codeMappingRepository.save(req);
+        codeMappingRepository.saveAll(req);
         return ResponseEntity.ok().body("/sync/code_mapping");
 
     }
