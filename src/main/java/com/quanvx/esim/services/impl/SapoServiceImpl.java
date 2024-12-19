@@ -95,7 +95,7 @@ public class SapoServiceImpl implements SapoService {
         // mock data joytel
         JoytelResponse<OrderResponse> res = joytel.orderJoytel(mockDateJoytel(req));
         log.info(Optional.ofNullable(res).orElse(new JoytelResponse<>()).toString());
-        if(res == null || res.getCode() != 0 || res.getData() == null) {
+        if (res == null || res.getCode() != 0 || res.getData() == null) {
             sapoOrder.setEnumStatusOrder(EnumStatusOrder.SEND_JOYTEL_FAIL);
             sapoOrderRepository.save(sapoOrder);
             return;
@@ -114,18 +114,18 @@ public class SapoServiceImpl implements SapoService {
         OrderRequestDTO orderRequest = new OrderRequestDTO();
         orderRequest.setCustomerCode(appConfig.getJoytelCustomerCode());
         orderRequest.setType(3);
-        orderRequest.setReceiveName("test");
-        orderRequest.setPhone("0838866309");
-        orderRequest.setTimestamp(1667807404146L);
-        orderRequest.setRemark("test");
-        orderRequest.setEmail("quanvu143@gmail.com");
+        orderRequest.setReceiveName("Oder esim");
+        orderRequest.setPhone("0965286001");
+        orderRequest.setTimestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()).toEpochSecond());
+        orderRequest.setRemark("Oder esim");
+        orderRequest.setEmail("hhd14tq@gmail.com");
 
         // Create the item list
         List<OrderRequestDTO.Item> items = req.getLineItems().stream().map(e -> {
             OrderRequestDTO.Item item1 = new OrderRequestDTO.Item();
             item1.setProductCode("eSIM-test");
             item1.setQuantity(e.getQuantity());
-            return  item1;
+            return item1;
         }).toList();
 
         // Set the item list in the DTO
@@ -139,9 +139,7 @@ public class SapoServiceImpl implements SapoService {
 
 
     }
-
-
-    private String getCustomString( OrderRequestDTO orderRequest) {
+    private String getCustomString(OrderRequestDTO orderRequest) {
         // Concatenate itemList details
         String itemDetails = orderRequest.getItemList().stream()
                 .map(item -> item.getProductCode() + item.getQuantity())
@@ -160,19 +158,4 @@ public class SapoServiceImpl implements SapoService {
                 itemDetails);
 
     }
-
-    private OrderRequestDTO mockDataOrderQuery(SapoOrderRequestDTO req, String orderTid, String orderCode) {
-        OrderRequestDTO orderRequest = new OrderRequestDTO();
-        orderRequest.setCustomerCode(appConfig.getJoytelCustomerCode());
-        orderRequest.setOrderCode(orderCode);
-        orderRequest.setTimestamp(DatetimeUtil.getTimestamp());
-        orderRequest.setOrderTid(orderTid);
-        String str = appConfig.getJoytelCustomerCode() + appConfig.getJoytelCustomerAuth() + Optional.ofNullable(orderCode).orElse("") + Optional.ofNullable(orderTid).orElse("") + String.valueOf(orderRequest.getTimestamp());
-        String autoGraph = encryptionService.sha1Encrypt(str);
-        orderRequest.setAutoGraph(autoGraph);
-        return orderRequest;
-    }
-
-
-
 }
