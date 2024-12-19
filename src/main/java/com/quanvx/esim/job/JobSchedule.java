@@ -155,7 +155,6 @@ public class JobSchedule {
                 esim.setCid(res.getData().getCid());
                 esim.setEnumStatusOrder(EnumStatusOrder.GET_JOYTEL_QUERY_SUCCESS);
                 esimRepository.save(esim);
-                emailService.sendMailQr(esim);
                 return;
             }
             esim.setEnumStatusOrder(EnumStatusOrder.GET_JOYTEL_QUERY_FAIL);
@@ -163,6 +162,22 @@ public class JobSchedule {
         });
         //
         log.info("------- end runJobGetQRQuery ---------");
+    }
+
+    @Scheduled(cron = "0 */1 * * * *") // Every 3 minutes
+    public void runJobSendMail() {
+        log.info("Job is running every 1 minutes: " + java.time.LocalDateTime.now());
+        log.info("------- runJobSendMail ---------");
+        //get order
+        List<SapoOrderEntity> orders = orderRepository.findAllByEnumStatusOrder(EnumStatusOrder.GET_JOYTEL_QUERY_SUCCESS);
+        orders.forEach(order -> {
+            List<EsimEntity> esims = esimRepository.findAllByOrderId(order.getDbId());
+            if(esims.stream().allMatch(e -> e.getEnumStatusOrder() == EnumStatusOrder.GET_JOYTEL_QUERY_SUCCESS)) {
+                emailService.sendMailQr(order);
+            }
+        });
+        //
+        log.info("------- end runJobSendMail ---------");
     }
 
 }

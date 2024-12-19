@@ -11,4 +11,6 @@ import java.util.List;
 @Repository
 public interface SapoOrderRepository extends JpaRepository<SapoOrderEntity, Long> {
     List<SapoOrderEntity> findAllByEnumStatusOrderAndTimeCheckQueryBefore(EnumStatusOrder enumStatusOrder, LocalDateTime timecheckQuery);
+
+    List<SapoOrderEntity> findAllByEnumStatusOrder(EnumStatusOrder enumStatusOrder);
 }

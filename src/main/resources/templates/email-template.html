@@ -7,6 +7,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
+            margin-bottom: 20px;
         }
         table, th, td {
             border: 1px solid black;
@@ -31,7 +32,7 @@
     </style>
 </head>
 <body>
-<h1>Dear Customer.</h1>
+<h1>Dear Customer,</h1>
 <p>
     Thank you for choosing our eSIM Service. Below is your order information, including an eSIM QR Code.
     Scan the QR code with your device camera and follow the prompts to get started.
@@ -47,46 +48,37 @@
 
 <p class="note">NOTE: Please do not reply to this email</p>
 
-<!-- Order Table -->
-<table>
-    <tr>
-        <th>Order ID</th>
-        <td th:text="${orderID}"></td>
-    </tr>
-    <tr>
-        <th>Order Time</th>
-        <td th:text="${orderTime}"></td>
-    </tr>
-    <tr>
-        <th>SN</th>
-        <td th:text="${sn}"></td>
-    </tr>
-    <tr>
-        <th>PIN</th>
-        <td th:text="${pin}"></td>
-    </tr>
-    <tr>
-        <th>PUK</th>
-        <td th:text="${puk}"></td>
-    </tr>
-<!--    <tr>-->
-<!--        <th>SM-DP+ Address</th>-->
-<!--        <td th:text="${smdpAddress}"></td>-->
-<!--    </tr>-->
-<!--    <tr>-->
-<!--        <th>Activation Code</th>-->
-<!--        <td th:text="${activationCode}"></td>-->
-<!--    </tr>-->
-<!--    <tr>-->
-<!--        <th>SM-DP+ Address & Activation Code</th>-->
-<!--        <td th:text="${fullActivationCode}"></td>-->
-<!--    </tr>-->
-</table>
+<!-- Loop through the list of orders -->
+<div th:each="order : ${orders}">
+    <!-- Order Information Table -->
+    <table>
+        <tr>
+            <th>Order ID</th>
+            <td th:text="${orderID}"></td>
+        </tr>
+        <tr>
+            <th>Order Time</th>
+            <td th:text="${orderTime}"></td>
+        </tr>
+        <tr>
+            <th>SN</th>
+            <td th:text="${order.snCode}"></td>
+        </tr>
+        <tr>
+            <th>PIN</th>
+            <td th:text="${order.pin1}"></td>
+        </tr>
+        <tr>
+            <th>PUK</th>
+            <td th:text="${order.puk1}"></td>
+        </tr>
+    </table>
 
-<!-- QR Code Section -->
-<div class="qr-code">
-    <p><strong>QR Code</strong></p>
-    <img th:src="@{${qrCodeImage}}" alt="QR Code" />
+    <!-- QR Code Section -->
+    <div class="qr-code">
+        <p><strong>QR Code</strong></p>
+        <img th:src="@{${order.qrcode}}" alt="QR Code" />
+    </div>
 </div>
 </body>
 </html>
